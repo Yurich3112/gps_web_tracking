@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>🔥 FireGuard - Моніторинг Пожежника</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --fire-orange: #ff6b35;
+            --fire-red: #e63946;
+            --fire-yellow: #ffd166;
+            --dark-bg: #0a0a0f;
+            --card-bg: rgba(26, 15, 15, 0.85);
+            --text-primary: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --safe: #28a745;
+            --glow-orange: 0 0 20px rgba(255, 107, 53, 0.5);
+            --glow-red: 0 0 30px rgba(230, 57, 70, 0.7);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated fire background */
+        .fire-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 50% 100%, rgba(255, 107, 53, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(230, 57, 70, 0.1) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% 90%, rgba(255, 209, 102, 0.1) 0%, transparent 40%),
+                linear-gradient(180deg, #0a0a0f 0%, #1a0a0a 100%);
+            animation: firePulse 4s ease-in-out infinite;
+        }
+
+        @keyframes firePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Header */
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(255, 107, 53, 0.2) 0%, transparent 100%);
+            border-bottom: 2px solid var(--fire-orange);
+            position: relative;
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--fire-yellow), var(--fire-orange), var(--fire-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: var(--glow-orange);
+            letter-spacing: 3px;
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            letter-spacing: 2px;
+        }
+
+        /* Status indicator */
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: var(--card-bg);
+            border-bottom: 1px solid rgba(255, 107, 53, 0.3);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--safe);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.danger {
+            background: var(--danger);
+            animation: dangerPulse 0.5s infinite;
+        }
+
+        .status-indicator.warning {
+            background: var(--warning);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+        }
+
+        @keyframes dangerPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.9); transform: scale(1); }
+            50% { box-shadow: 0 0 20px 10px rgba(220, 53, 69, 0); transform: scale(1.2); }
+        }
+
+        .status-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        /* Main container */
+        .container {
+            padding: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Sensor cards */
+        .sensor-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sensor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--fire-orange), var(--fire-yellow), var(--fire-orange));
+        }
+
+        .sensor-card.alert {
+            border-color: var(--danger);
+            box-shadow: var(--glow-red);
+            animation: alertShake 0.5s ease-in-out;
+        }
+
+        @keyframes alertShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .sensor-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .sensor-icon {
+            font-size: 1.5rem;
+        }
+
+        .sensor-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--fire-orange);
+        }
+
+        .sensor-data {
+            display: grid;
+            gap: 10px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 3px solid var(--fire-orange);
+        }
+
+        .data-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .data-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--fire-yellow);
+        }
+
+        /* Fall detection visualization */
+        .fall-detector {
+            position: relative;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .person-icon {
+            font-size: 4rem;
+            transition: transform 0.3s ease;
+        }
+
+        .person-icon.falling {
+            animation: fallAnimation 1s ease-in-out;
+        }
+
+        @keyframes fallAnimation {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg) translateX(30px); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .g-force-meter {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .g-force-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--safe), var(--warning), var(--danger));
+            transition: width 0.1s ease;
+            border-radius: 4px;
+        }
+
+        /* Control buttons */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--fire-orange), var(--fire-red));
+            color: white;
+            grid-column: span 2;
+            box-shadow: var(--glow-orange);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 30px rgba(255, 107, 53, 0.6);
+        }
+
+        .btn-start:active {
+            transform: translateY(0);
+        }
+
+        .btn-start.active {
+            background: linear-gradient(135deg, var(--safe), #20c997);
+            box-shadow: 0 0 20px rgba(40, 167, 69, 0.5);
+        }
+
+        .btn-sos {
+            background: var(--danger);
+            color: white;
+            animation: sosPulse 2s infinite;
+        }
+
+        @keyframes sosPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            50% { box-shadow: 0 0 20px 5px rgba(220, 53, 69, 0.3); }
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Alert modal */
+        .alert-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alert-modal.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .alert-content {
+            background: linear-gradient(135deg, var(--danger), #b02a37);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            animation: alertBounce 0.5s ease;
+        }
+
+        @keyframes alertBounce {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .alert-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        .alert-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .alert-text {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .alert-countdown {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        .btn-cancel-alert {
+            background: white;
+            color: var(--danger);
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Log section */
+        .log-section {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            color: var(--fire-orange);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .log-entry {
+            font-size: 0.75rem;
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            margin-bottom: 5px;
+            border-left: 2px solid var(--fire-orange);
+        }
+
+        .log-entry.danger {
+            border-left-color: var(--danger);
+            background: rgba(220, 53, 69, 0.2);
+        }
+
+        .log-time {
+            color: var(--text-secondary);
+            margin-right: 10px;
+        }
+
+        /* Permissions section */
+        .permissions-section {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .permissions-section h3 {
+            color: var(--warning);
+            margin-bottom: 10px;
+        }
+
+        .permission-list {
+            text-align: left;
+            margin: 15px 0;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .permission-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .permission-status.granted {
+            background: var(--safe);
+        }
+
+        .permission-status.denied {
+            background: var(--danger);
+        }
+
+        .permission-status.pending {
+            background: var(--warning);
+        }
+
+        /* Responsive */
+        @media (max-width: 380px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .sensor-title {
+                font-size: 0.85rem;
+            }
+            
+            .data-value {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* HTTPS warning */
+        .https-warning {
+            background: linear-gradient(135deg, var(--danger), #b02a37);
+            padding: 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin: 20px;
+        }
+
+        .https-warning h2 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="fire-bg"></div>
+
+    <header class="header">
+        <h1>🔥 FIREGUARD</h1>
+        <div class="subtitle">Система Моніторингу Пожежника</div>
+    </header>
+
+    <div class="status-bar">
+        <div class="status-indicator" id="statusIndicator"></div>
+        <span class="status-text" id="statusText">ОЧІКУВАННЯ</span>
+    </div>
+
+    <div class="container">
+        <!-- HTTPS Warning (shown if not secure) -->
+        <div class="https-warning" id="httpsWarning" style="display: none;">
+            <h2>⚠️ Потрібен HTTPS</h2>
+            <p>Для доступу до сенсорів потрібне захищене з'єднання. Використовуйте HTTPS або localhost.</p>
+        </div>
+
+        <!-- Permissions Section -->
+        <div class="permissions-section" id="permissionsSection">
+            <h3>📱 Дозволи Сенсорів</h3>
+            <p>Для роботи системи потрібен доступ до сенсорів телефону</p>
+            <div class="permission-list">
+                <div class="permission-item">
+                    <div class="permission-status pending" id="gpsStatus">?</div>
+                    <span>GPS / Геолокація</span>
+                </div>
+                <div class="permission-item">
+                    <div class="permission-status pending" id="motionStatus">?</div>
+                    <span>Акселерометр / Гіроскоп</span>
+                </div>
+            </div>
+            <button class="btn btn-start" onclick="requestPermissions()">
+                🚀 ЗАПРОСИТИ ДОЗВОЛИ
+            </button>
+        </div>
+
+        <!-- GPS Card -->
+        <div class="sensor-card" id="gpsCard">
+            <div class="sensor-header">
+                <span class="sensor-icon">📍</span>
+                <span class="sensor-title">GPS ПОЗИЦІЯ</span>
+            </div>
+            <div class="sensor-data">
+                <div class="data-row">
+                    <span class="data-label">Широта</span>
+                    <span class="data-value" id="latitude">---.------</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Довгота</span>
+                    <span class="data-value" id="longitude">---.------</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Точність</span>
+                    <span class="data-value" id="accuracy">--- м</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Швидкість</span>
+                    <span class="data-value" id="speed">--- км/г</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accelerometer Card -->
+        <div class="sensor-card" id="accelCard">
+            <div class="sensor-header">
+                <span class="sensor-icon">📊</span>
+                <span class="sensor-title">АКСЕЛЕРОМЕТР</span>
+            </div>
+            <div class="sensor-data">
+                <div class="data-row">
+                    <span class="data-label">X</span>
+                    <span class="data-value" id="accelX">0.00 m/s²</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Y</span>
+                    <span class="data-value" id="accelY">0.00 m/s²</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Z</span>
+                    <span class="data-value" id="accelZ">0.00 m/s²</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">G-Force</span>
+                    <span class="data-value" id="gForce">1.00 G</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fall Detection Card -->
+        <div class="sensor-card" id="fallCard">
+            <div class="sensor-header">
+                <span class="sensor-icon">🚨</span>
+                <span class="sensor-title">ДЕТЕКЦІЯ ПАДІННЯ</span>
+            </div>
+            <div class="fall-detector">
+                <div class="person-icon" id="personIcon">🧑‍🚒</div>
+                <div class="g-force-meter">
+                    <div class="g-force-bar" id="gForceBar" style="width: 10%"></div>
+                </div>
+            </div>
+            <div class="sensor-data">
+                <div class="data-row">
+                    <span class="data-label">Поріг падіння</span>
+                    <span class="data-value">2.5 G</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Статус</span>
+                    <span class="data-value" id="fallStatus">НОРМА ✓</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gyroscope Card -->
+        <div class="sensor-card" id="gyroCard">
+            <div class="sensor-header">
+                <span class="sensor-icon">🔄</span>
+                <span class="sensor-title">ГІРОСКОП / ОРІЄНТАЦІЯ</span>
+            </div>
+            <div class="sensor-data">
+                <div class="data-row">
+                    <span class="data-label">Alpha (Z)</span>
+                    <span class="data-value" id="alpha">0°</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Beta (X)</span>
+                    <span class="data-value" id="beta">0°</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Gamma (Y)</span>
+                    <span class="data-value" id="gamma">0°</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn btn-start" id="btnStart" onclick="toggleMonitoring()">
+                ▶ СТАРТ МОНІТОРИНГУ
+            </button>
+            <button class="btn btn-sos" onclick="triggerSOS()">
+                🆘 SOS
+            </button>
+            <button class="btn btn-reset" onclick="resetAlerts()">
+                🔄 СКИНУТИ
+            </button>
+        </div>
+
+        <!-- Event Log -->
+        <div class="log-section">
+            <div class="log-title">📋 ЖУРНАЛ ПОДІЙ</div>
+            <div id="logContainer">
+                <div class="log-entry">
+                    <span class="log-time">--:--:--</span>
+                    Система готова до запуску
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="alert-modal" id="alertModal">
+        <div class="alert-content">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-title">ПАДІННЯ ВИЯВЛЕНО!</div>
+            <div class="alert-text">Автоматичний виклик допомоги через:</div>
+            <div class="alert-countdown" id="alertCountdown">10</div>
+            <button class="btn-cancel-alert" onclick="cancelAlert()">
+                ❌ Я В ПОРЯДКУ
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // FireGuard - Система Моніторингу Пожежника
+        // ============================================
+
+        // State
+        let isMonitoring = false;
+        let watchId = null;
+        let alertTimeout = null;
+        let alertCountdown = 10;
+        let countdownInterval = null;
+        let lastPosition = null;
+        let fallThreshold = 2.5; // G-force threshold for fall detection
+        let impactCooldown = false;
+
+        // DOM Elements
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const btnStart = document.getElementById('btnStart');
+        const alertModal = document.getElementById('alertModal');
+        const logContainer = document.getElementById('logContainer');
+        const permissionsSection = document.getElementById('permissionsSection');
+        const httpsWarning = document.getElementById('httpsWarning');
+
+        // Permission status elements
+        const gpsStatusEl = document.getElementById('gpsStatus');
+        const motionStatusEl = document.getElementById('motionStatus');
+
+        // Check HTTPS
+        function checkSecureContext() {
+            if (!window.isSecureContext && location.hostname !== 'localhost') {
+                httpsWarning.style.display = 'block';
+                addLog('⚠️ Потрібне HTTPS з\'єднання!', true);
+                return false;
+            }
+            return true;
+        }
+
+        // Request permissions
+        async function requestPermissions() {
+            addLog('📱 Запит дозволів...');
+
+            // Request GPS permission
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000
+                    });
+                });
+                gpsStatusEl.textContent = '✓';
+                gpsStatusEl.classList.remove('pending', 'denied');
+                gpsStatusEl.classList.add('granted');
+                addLog('✅ GPS дозвіл отримано');
+            } catch (err) {
+                gpsStatusEl.textContent = '✗';
+                gpsStatusEl.classList.remove('pending', 'granted');
+                gpsStatusEl.classList.add('denied');
+                addLog('❌ GPS: ' + err.message, true);
+            }
+
+            // Request Motion permission (iOS requires explicit permission)
+            if (typeof DeviceMotionEvent !== 'undefined') {
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    // iOS 13+ requires permission request
+                    try {
+                        const permissionState = await DeviceMotionEvent.requestPermission();
+                        if (permissionState === 'granted') {
+                            motionStatusEl.textContent = '✓';
+                            motionStatusEl.classList.remove('pending', 'denied');
+                            motionStatusEl.classList.add('granted');
+                            addLog('✅ Акселерометр дозвіл отримано');
+                        } else {
+                            throw new Error('Permission denied');
+                        }
+                    } catch (err) {
+                        motionStatusEl.textContent = '✗';
+                        motionStatusEl.classList.remove('pending', 'granted');
+                        motionStatusEl.classList.add('denied');
+                        addLog('❌ Акселерометр: ' + err.message, true);
+                    }
+                } else {
+                    // Android and older iOS - no explicit permission needed
+                    motionStatusEl.textContent = '✓';
+                    motionStatusEl.classList.remove('pending', 'denied');
+                    motionStatusEl.classList.add('granted');
+                    addLog('✅ Сенсори руху доступні');
+                }
+            } else {
+                motionStatusEl.textContent = '✗';
+                motionStatusEl.classList.remove('pending', 'granted');
+                motionStatusEl.classList.add('denied');
+                addLog('❌ DeviceMotion не підтримується', true);
+            }
+
+            permissionsSection.style.display = 'none';
+        }
+
+        // Toggle monitoring
+        function toggleMonitoring() {
+            if (isMonitoring) {
+                stopMonitoring();
+            } else {
+                startMonitoring();
+            }
+        }
+
+        // Start monitoring
+        function startMonitoring() {
+            if (!checkSecureContext()) return;
+
+            isMonitoring = true;
+            btnStart.textContent = '⏹ ЗУПИНИТИ';
+            btnStart.classList.add('active');
+            statusIndicator.classList.remove('danger', 'warning');
+            statusText.textContent = 'АКТИВНИЙ';
+            addLog('🚀 Моніторинг запущено');
+
+            // Start GPS tracking
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(
+                    updateGPS,
+                    handleGPSError,
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 30000,
+                        maximumAge: 0
+                    }
+                );
+            }
+
+            // Start motion sensors
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', handleMotion);
+            }
+
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        }
+
+        // Stop monitoring
+        function stopMonitoring() {
+            isMonitoring = false;
+            btnStart.textContent = '▶ СТАРТ МОНІТОРИНГУ';
+            btnStart.classList.remove('active');
+            statusText.textContent = 'ЗУПИНЕНО';
+            addLog('⏹ Моніторинг зупинено');
+
+            // Stop GPS
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+
+            // Stop motion sensors
+            window.removeEventListener('devicemotion', handleMotion);
+            window.removeEventListener('deviceorientation', handleOrientation);
+        }
+
+        // Update GPS data
+        function updateGPS(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const acc = position.coords.accuracy;
+            const spd = position.coords.speed;
+
+            document.getElementById('latitude').textContent = lat.toFixed(6) + '°';
+            document.getElementById('longitude').textContent = lon.toFixed(6) + '°';
+            document.getElementById('accuracy').textContent = acc.toFixed(1) + ' м';
+            document.getElementById('speed').textContent = spd ? (spd * 3.6).toFixed(1) + ' км/г' : '0.0 км/г';
+
+            // Store last position for emergency
+            lastPosition = {
+                lat: lat,
+                lon: lon,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        function handleGPSError(error) {
+            addLog('⚠️ GPS помилка: ' + error.message, true);
+        }
+
+        // Handle accelerometer data
+        function handleMotion(event) {
+            const acc = event.accelerationIncludingGravity || event.acceleration;
+            
+            if (!acc) return;
+
+            const x = acc.x || 0;
+            const y = acc.y || 0;
+            const z = acc.z || 0;
+
+            // Update display
+            document.getElementById('accelX').textContent = x.toFixed(2) + ' m/s²';
+            document.getElementById('accelY').textContent = y.toFixed(2) + ' m/s²';
+            document.getElementById('accelZ').textContent = z.toFixed(2) + ' m/s²';
+
+            // Calculate total G-force
+            const gForce = Math.sqrt(x*x + y*y + z*z) / 9.81;
+            document.getElementById('gForce').textContent = gForce.toFixed(2) + ' G';
+
+            // Update G-force bar
+            const barWidth = Math.min(gForce / 5 * 100, 100);
+            document.getElementById('gForceBar').style.width = barWidth + '%';
+
+            // Detect fall (sudden high G-force or free fall)
+            detectFall(gForce, x, y, z);
+        }
+
+        // Detect fall based on G-force patterns
+        function detectFall(gForce, x, y, z) {
+            const fallStatus = document.getElementById('fallStatus');
+            const personIcon = document.getElementById('personIcon');
+            const accelCard = document.getElementById('accelCard');
+            const fallCard = document.getElementById('fallCard');
+
+            // Free fall detection (G-force near 0) or high impact
+            const isFreefall = gForce < 0.3;
+            const isImpact = gForce > fallThreshold;
+
+            if ((isFreefall || isImpact) && !impactCooldown) {
+                impactCooldown = true;
+                
+                // Visual feedback
+                fallStatus.textContent = '⚠️ ПАДІННЯ!';
+                fallStatus.style.color = '#dc3545';
+                personIcon.classList.add('falling');
+                accelCard.classList.add('alert');
+                fallCard.classList.add('alert');
+                statusIndicator.classList.add('danger');
+                statusText.textContent = 'ПАДІННЯ!';
+
+                addLog(`🚨 ПАДІННЯ ВИЯВЛЕНО! G-Force: ${gForce.toFixed(2)}G`, true);
+
+                // Vibrate phone
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200, 100, 200]);
+                }
+
+                // Show alert modal
+                showFallAlert();
+
+                // Reset visual after 3 seconds
+                setTimeout(() => {
+                    personIcon.classList.remove('falling');
+                    impactCooldown = false;
+                }, 3000);
+            } else if (!impactCooldown) {
+                fallStatus.textContent = 'НОРМА ✓';
+                fallStatus.style.color = '#28a745';
+                accelCard.classList.remove('alert');
+                fallCard.classList.remove('alert');
+            }
+        }
+
+        // Handle gyroscope/orientation data
+        function handleOrientation(event) {
+            const alpha = event.alpha || 0; // Z-axis rotation
+            const beta = event.beta || 0;   // X-axis rotation
+            const gamma = event.gamma || 0; // Y-axis rotation
+
+            document.getElementById('alpha').textContent = alpha.toFixed(0) + '°';
+            document.getElementById('beta').textContent = beta.toFixed(0) + '°';
+            document.getElementById('gamma').textContent = gamma.toFixed(0) + '°';
+        }
+
+        // Show fall alert
+        function showFallAlert() {
+            alertModal.classList.add('show');
+            alertCountdown = 10;
+            document.getElementById('alertCountdown').textContent = alertCountdown;
+
+            countdownInterval = setInterval(() => {
+                alertCountdown--;
+                document.getElementById('alertCountdown').textContent = alertCountdown;
+
+                if (alertCountdown <= 0) {
+                    clearInterval(countdownInterval);
+                    triggerEmergency();
+                }
+            }, 1000);
+        }
+
+        // Cancel alert
+        function cancelAlert() {
+            alertModal.classList.remove('show');
+            clearInterval(countdownInterval);
+            statusIndicator.classList.remove('danger');
+            statusText.textContent = 'АКТИВНИЙ';
+            addLog('✅ Тривога скасована користувачем');
+            
+            // Stop vibration
+            if (navigator.vibrate) {
+                navigator.vibrate(0);
+            }
+        }
+
+        // Trigger emergency (SOS)
+        function triggerSOS() {
+            addLog('🆘 SOS АКТИВОВАНО ВРУЧНУ!', true);
+            triggerEmergency();
+        }
+
+        // Trigger emergency response
+        function triggerEmergency() {
+            alertModal.classList.remove('show');
+            clearInterval(countdownInterval);
+
+            // Continuous vibration pattern
+            if (navigator.vibrate) {
+                navigator.vibrate([500, 200, 500, 200, 500, 200, 500]);
+            }
+
+            addLog('🚨 ВИКЛИК ДОПОМОГИ!', true);
+
+            // Create emergency message
+            let emergencyMsg = '🚨 ТРИВОГА ПОЖЕЖНИКА!\n';
+            emergencyMsg += `Час: ${new Date().toLocaleString()}\n`;
+            
+            if (lastPosition) {
+                emergencyMsg += `Координати: ${lastPosition.lat.toFixed(6)}, ${lastPosition.lon.toFixed(6)}\n`;
+                emergencyMsg += `Google Maps: https://maps.google.com/?q=${lastPosition.lat},${lastPosition.lon}`;
+            }
+
+            // Show alert with location
+            alert(emergencyMsg);
+
+            // In production, this would send to a server
+            console.log('EMERGENCY DATA:', {
+                timestamp: new Date().toISOString(),
+                position: lastPosition,
+                type: 'FALL_DETECTED'
+            });
+
+            statusIndicator.classList.add('danger');
+            statusText.textContent = 'SOS АКТИВНИЙ';
+        }
+
+        // Reset alerts
+        function resetAlerts() {
+            cancelAlert();
+            document.querySelectorAll('.sensor-card').forEach(card => {
+                card.classList.remove('alert');
+            });
+            document.getElementById('fallStatus').textContent = 'НОРМА ✓';
+            document.getElementById('fallStatus').style.color = '#28a745';
+            statusIndicator.classList.remove('danger', 'warning');
+            if (isMonitoring) {
+                statusText.textContent = 'АКТИВНИЙ';
+            }
+            addLog('🔄 Систему скинуто');
+        }
+
+        // Add log entry
+        function addLog(message, isDanger = false) {
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry' + (isDanger ? ' danger' : '');
+            entry.innerHTML = `<span class="log-time">${time}</span>${message}`;
+            logContainer.insertBefore(entry, logContainer.firstChild);
+
+            // Keep only last 50 entries
+            while (logContainer.children.length > 50) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('🔥 FireGuard v1.0 завантажено');
+            checkSecureContext();
+
+            // Check if sensors are available
+            if (!navigator.geolocation) {
+                addLog('⚠️ Geolocation API не підтримується', true);
+            }
+            if (!window.DeviceMotionEvent) {
+                addLog('⚠️ DeviceMotion API не підтримується', true);
+            }
+            if (!window.DeviceOrientationEvent) {
+                addLog('⚠️ DeviceOrientation API не підтримується', true);
+            }
+        });
+
+        // Prevent screen from sleeping (if supported)
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    await navigator.wakeLock.request('screen');
+                    addLog('📱 Екран заблоковано від сну');
+                } catch (err) {
+                    console.log('Wake Lock error:', err);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+

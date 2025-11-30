@@ -1,0 +1,18 @@
+{
+    "name": "FireGuard - Моніторинг Пожежника",
+    "short_name": "FireGuard",
+    "description": "Система моніторингу безпеки пожежника з детекцією падіння",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0a0a0f",
+    "theme_color": "#ff6b35",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}
+
