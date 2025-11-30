@@ -1130,6 +1130,12 @@
             stepCooldown: false         // Prevent double counting
         };
 
+        // Compass smoothing state
+        let compassState = {
+            currentRotation: 0,         // Current CSS rotation value (can exceed 360°)
+            lastHeading: 0              // Last raw heading value
+        };
+
         // DOM Elements
         const statusIndicator = document.getElementById('statusIndicator');
         const statusText = document.getElementById('statusText');
@@ -1504,9 +1510,20 @@
 
             // Update compass display
             document.getElementById('heading').textContent = Math.round(heading) + '°';
+            
+            // Smooth compass rotation - avoid jumping across 0°/360°
+            let targetRotation = -heading;
+            let delta = targetRotation - compassState.currentRotation;
+            
+            // Normalize delta to [-180, 180] for shortest path
+            while (delta > 180) delta -= 360;
+            while (delta < -180) delta += 360;
+            
+            compassState.currentRotation += delta;
+            
             // Needle points to NORTH - rotate opposite to heading
             document.getElementById('compassNeedle').style.transform = 
-                `translate(-50%, -50%) rotate(${-heading}deg)`;
+                `translate(-50%, -50%) rotate(${compassState.currentRotation}deg)`;
 
             // Gyroscope display
             document.getElementById('alpha').textContent = (event.alpha || 0).toFixed(0) + '°';
