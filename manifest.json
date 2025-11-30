@@ -1,7 +1,7 @@
 {
-    "name": "FireGuard - Моніторинг Пожежника",
+    "name": "FireGuard - Monitoring Strażaka",
     "short_name": "FireGuard",
-    "description": "Система моніторингу безпеки пожежника з детекцією падіння",
+    "description": "System monitoringu bezpieczeństwa strażaka z wykrywaniem upadku",
     "start_url": "/index.html",
     "display": "standalone",
     "orientation": "portrait",
@@ -15,4 +15,3 @@
         }
     ]
 }
-

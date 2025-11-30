@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#1a0a0a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>🔥 FireGuard - Моніторинг Пожежника</title>
+    <title>🔥 FireGuard - Monitoring Strażaka</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
@@ -528,37 +528,37 @@
 
     <header class="header">
         <h1>🔥 FIREGUARD</h1>
-        <div class="subtitle">Система Моніторингу Пожежника</div>
+        <div class="subtitle">System Monitoringu Strażaka</div>
     </header>
 
     <div class="status-bar">
         <div class="status-indicator" id="statusIndicator"></div>
-        <span class="status-text" id="statusText">ОЧІКУВАННЯ</span>
+        <span class="status-text" id="statusText">OCZEKIWANIE</span>
     </div>
 
     <div class="container">
         <!-- HTTPS Warning (shown if not secure) -->
         <div class="https-warning" id="httpsWarning" style="display: none;">
-            <h2>⚠️ Потрібен HTTPS</h2>
-            <p>Для доступу до сенсорів потрібне захищене з'єднання. Використовуйте HTTPS або localhost.</p>
+            <h2>⚠️ Wymagany HTTPS</h2>
+            <p>Do dostępu do czujników wymagane jest bezpieczne połączenie. Użyj HTTPS lub localhost.</p>
         </div>
 
         <!-- Permissions Section -->
         <div class="permissions-section" id="permissionsSection">
-            <h3>📱 Дозволи Сенсорів</h3>
-            <p>Для роботи системи потрібен доступ до сенсорів телефону</p>
+            <h3>📱 Uprawnienia Czujników</h3>
+            <p>Do działania systemu wymagany jest dostęp do czujników telefonu</p>
             <div class="permission-list">
                 <div class="permission-item">
                     <div class="permission-status pending" id="gpsStatus">?</div>
-                    <span>GPS / Геолокація</span>
+                    <span>GPS / Geolokalizacja</span>
                 </div>
                 <div class="permission-item">
                     <div class="permission-status pending" id="motionStatus">?</div>
-                    <span>Акселерометр / Гіроскоп</span>
+                    <span>Akcelerometr / Żyroskop</span>
                 </div>
             </div>
             <button class="btn btn-start" onclick="requestPermissions()">
-                🚀 ЗАПРОСИТИ ДОЗВОЛИ
+                🚀 POPROŚ O UPRAWNIENIA
             </button>
         </div>
 
@@ -566,24 +566,24 @@
         <div class="sensor-card" id="gpsCard">
             <div class="sensor-header">
                 <span class="sensor-icon">📍</span>
-                <span class="sensor-title">GPS ПОЗИЦІЯ</span>
+                <span class="sensor-title">POZYCJA GPS</span>
             </div>
             <div class="sensor-data">
                 <div class="data-row">
-                    <span class="data-label">Широта</span>
+                    <span class="data-label">Szerokość</span>
                     <span class="data-value" id="latitude">---.------</span>
                 </div>
                 <div class="data-row">
-                    <span class="data-label">Довгота</span>
+                    <span class="data-label">Długość</span>
                     <span class="data-value" id="longitude">---.------</span>
                 </div>
                 <div class="data-row">
-                    <span class="data-label">Точність</span>
-                    <span class="data-value" id="accuracy">--- м</span>
+                    <span class="data-label">Dokładność</span>
+                    <span class="data-value" id="accuracy">--- m</span>
                 </div>
                 <div class="data-row">
-                    <span class="data-label">Швидкість</span>
-                    <span class="data-value" id="speed">--- км/г</span>
+                    <span class="data-label">Prędkość</span>
+                    <span class="data-value" id="speed">--- km/h</span>
                 </div>
             </div>
         </div>
@@ -592,7 +592,7 @@
         <div class="sensor-card" id="accelCard">
             <div class="sensor-header">
                 <span class="sensor-icon">📊</span>
-                <span class="sensor-title">АКСЕЛЕРОМЕТР</span>
+                <span class="sensor-title">AKCELEROMETR</span>
             </div>
             <div class="sensor-data">
                 <div class="data-row">
@@ -618,7 +618,7 @@
         <div class="sensor-card" id="fallCard">
             <div class="sensor-header">
                 <span class="sensor-icon">🚨</span>
-                <span class="sensor-title">ДЕТЕКЦІЯ ПАДІННЯ</span>
+                <span class="sensor-title">WYKRYWANIE UPADKU</span>
             </div>
             <div class="fall-detector">
                 <div class="person-icon" id="personIcon">🧑‍🚒</div>
@@ -628,12 +628,12 @@
             </div>
             <div class="sensor-data">
                 <div class="data-row">
-                    <span class="data-label">Поріг падіння</span>
+                    <span class="data-label">Próg upadku</span>
                     <span class="data-value">2.5 G</span>
                 </div>
                 <div class="data-row">
-                    <span class="data-label">Статус</span>
-                    <span class="data-value" id="fallStatus">НОРМА ✓</span>
+                    <span class="data-label">Status</span>
+                    <span class="data-value" id="fallStatus">NORMA ✓</span>
                 </div>
             </div>
         </div>
@@ -642,7 +642,7 @@
         <div class="sensor-card" id="gyroCard">
             <div class="sensor-header">
                 <span class="sensor-icon">🔄</span>
-                <span class="sensor-title">ГІРОСКОП / ОРІЄНТАЦІЯ</span>
+                <span class="sensor-title">ŻYROSKOP / ORIENTACJA</span>
             </div>
             <div class="sensor-data">
                 <div class="data-row">
@@ -663,23 +663,23 @@
         <!-- Controls -->
         <div class="controls">
             <button class="btn btn-start" id="btnStart" onclick="toggleMonitoring()">
-                ▶ СТАРТ МОНІТОРИНГУ
+                ▶ START MONITORINGU
             </button>
             <button class="btn btn-sos" onclick="triggerSOS()">
                 🆘 SOS
             </button>
             <button class="btn btn-reset" onclick="resetAlerts()">
-                🔄 СКИНУТИ
+                🔄 RESETUJ
             </button>
         </div>
 
         <!-- Event Log -->
         <div class="log-section">
-            <div class="log-title">📋 ЖУРНАЛ ПОДІЙ</div>
+            <div class="log-title">📋 DZIENNIK ZDARZEŃ</div>
             <div id="logContainer">
                 <div class="log-entry">
                     <span class="log-time">--:--:--</span>
-                    Система готова до запуску
+                    System gotowy do uruchomienia
                 </div>
             </div>
         </div>
@@ -689,18 +689,18 @@
     <div class="alert-modal" id="alertModal">
         <div class="alert-content">
             <div class="alert-icon">⚠️</div>
-            <div class="alert-title">ПАДІННЯ ВИЯВЛЕНО!</div>
-            <div class="alert-text">Автоматичний виклик допомоги через:</div>
+            <div class="alert-title">WYKRYTO UPADEK!</div>
+            <div class="alert-text">Automatyczne wezwanie pomocy za:</div>
             <div class="alert-countdown" id="alertCountdown">10</div>
             <button class="btn-cancel-alert" onclick="cancelAlert()">
-                ❌ Я В ПОРЯДКУ
+                ❌ WSZYSTKO W PORZĄDKU
             </button>
         </div>
     </div>
 
     <script>
         // ============================================
-        // FireGuard - Система Моніторингу Пожежника
+        // FireGuard - System Monitoringu Strażaka
         // ============================================
 
         // State
@@ -730,7 +730,7 @@
         function checkSecureContext() {
             if (!window.isSecureContext && location.hostname !== 'localhost') {
                 httpsWarning.style.display = 'block';
-                addLog('⚠️ Потрібне HTTPS з\'єднання!', true);
+                addLog('⚠️ Wymagane połączenie HTTPS!', true);
                 return false;
             }
             return true;
@@ -738,7 +738,7 @@
 
         // Request permissions
         async function requestPermissions() {
-            addLog('📱 Запит дозволів...');
+            addLog('📱 Żądanie uprawnień...');
 
             // Request GPS permission
             try {
@@ -751,7 +751,7 @@
                 gpsStatusEl.textContent = '✓';
                 gpsStatusEl.classList.remove('pending', 'denied');
                 gpsStatusEl.classList.add('granted');
-                addLog('✅ GPS дозвіл отримано');
+                addLog('✅ Uzyskano uprawnienie GPS');
             } catch (err) {
                 gpsStatusEl.textContent = '✗';
                 gpsStatusEl.classList.remove('pending', 'granted');
@@ -769,7 +769,7 @@
                             motionStatusEl.textContent = '✓';
                             motionStatusEl.classList.remove('pending', 'denied');
                             motionStatusEl.classList.add('granted');
-                            addLog('✅ Акселерометр дозвіл отримано');
+                            addLog('✅ Uzyskano uprawnienie akcelerometru');
                         } else {
                             throw new Error('Permission denied');
                         }
@@ -777,20 +777,20 @@
                         motionStatusEl.textContent = '✗';
                         motionStatusEl.classList.remove('pending', 'granted');
                         motionStatusEl.classList.add('denied');
-                        addLog('❌ Акселерометр: ' + err.message, true);
+                        addLog('❌ Akcelerometr: ' + err.message, true);
                     }
                 } else {
                     // Android and older iOS - no explicit permission needed
                     motionStatusEl.textContent = '✓';
                     motionStatusEl.classList.remove('pending', 'denied');
                     motionStatusEl.classList.add('granted');
-                    addLog('✅ Сенсори руху доступні');
+                    addLog('✅ Czujniki ruchu dostępne');
                 }
             } else {
                 motionStatusEl.textContent = '✗';
                 motionStatusEl.classList.remove('pending', 'granted');
                 motionStatusEl.classList.add('denied');
-                addLog('❌ DeviceMotion не підтримується', true);
+                addLog('❌ DeviceMotion nie jest obsługiwane', true);
             }
 
             permissionsSection.style.display = 'none';
@@ -810,11 +810,11 @@
             if (!checkSecureContext()) return;
 
             isMonitoring = true;
-            btnStart.textContent = '⏹ ЗУПИНИТИ';
+            btnStart.textContent = '⏹ ZATRZYMAJ';
             btnStart.classList.add('active');
             statusIndicator.classList.remove('danger', 'warning');
-            statusText.textContent = 'АКТИВНИЙ';
-            addLog('🚀 Моніторинг запущено');
+            statusText.textContent = 'AKTYWNY';
+            addLog('🚀 Monitoring uruchomiony');
 
             // Start GPS tracking
             if (navigator.geolocation) {
@@ -842,10 +842,10 @@
         // Stop monitoring
         function stopMonitoring() {
             isMonitoring = false;
-            btnStart.textContent = '▶ СТАРТ МОНІТОРИНГУ';
+            btnStart.textContent = '▶ START MONITORINGU';
             btnStart.classList.remove('active');
-            statusText.textContent = 'ЗУПИНЕНО';
-            addLog('⏹ Моніторинг зупинено');
+            statusText.textContent = 'ZATRZYMANO';
+            addLog('⏹ Monitoring zatrzymany');
 
             // Stop GPS
             if (watchId) {
@@ -867,8 +867,8 @@
 
             document.getElementById('latitude').textContent = lat.toFixed(6) + '°';
             document.getElementById('longitude').textContent = lon.toFixed(6) + '°';
-            document.getElementById('accuracy').textContent = acc.toFixed(1) + ' м';
-            document.getElementById('speed').textContent = spd ? (spd * 3.6).toFixed(1) + ' км/г' : '0.0 км/г';
+            document.getElementById('accuracy').textContent = acc.toFixed(1) + ' m';
+            document.getElementById('speed').textContent = spd ? (spd * 3.6).toFixed(1) + ' km/h' : '0.0 km/h';
 
             // Store last position for emergency
             lastPosition = {
@@ -879,7 +879,7 @@
         }
 
         function handleGPSError(error) {
-            addLog('⚠️ GPS помилка: ' + error.message, true);
+            addLog('⚠️ Błąd GPS: ' + error.message, true);
         }
 
         // Handle accelerometer data
@@ -924,15 +924,15 @@
                 impactCooldown = true;
                 
                 // Visual feedback
-                fallStatus.textContent = '⚠️ ПАДІННЯ!';
+                fallStatus.textContent = '⚠️ UPADEK!';
                 fallStatus.style.color = '#dc3545';
                 personIcon.classList.add('falling');
                 accelCard.classList.add('alert');
                 fallCard.classList.add('alert');
                 statusIndicator.classList.add('danger');
-                statusText.textContent = 'ПАДІННЯ!';
+                statusText.textContent = 'UPADEK!';
 
-                addLog(`🚨 ПАДІННЯ ВИЯВЛЕНО! G-Force: ${gForce.toFixed(2)}G`, true);
+                addLog(`🚨 WYKRYTO UPADEK! G-Force: ${gForce.toFixed(2)}G`, true);
 
                 // Vibrate phone
                 if (navigator.vibrate) {
@@ -948,7 +948,7 @@
                     impactCooldown = false;
                 }, 3000);
             } else if (!impactCooldown) {
-                fallStatus.textContent = 'НОРМА ✓';
+                fallStatus.textContent = 'NORMA ✓';
                 fallStatus.style.color = '#28a745';
                 accelCard.classList.remove('alert');
                 fallCard.classList.remove('alert');
@@ -988,8 +988,8 @@
             alertModal.classList.remove('show');
             clearInterval(countdownInterval);
             statusIndicator.classList.remove('danger');
-            statusText.textContent = 'АКТИВНИЙ';
-            addLog('✅ Тривога скасована користувачем');
+            statusText.textContent = 'AKTYWNY';
+            addLog('✅ Alarm anulowany przez użytkownika');
             
             // Stop vibration
             if (navigator.vibrate) {
@@ -999,7 +999,7 @@
 
         // Trigger emergency (SOS)
         function triggerSOS() {
-            addLog('🆘 SOS АКТИВОВАНО ВРУЧНУ!', true);
+            addLog('🆘 SOS AKTYWOWANE RĘCZNIE!', true);
             triggerEmergency();
         }
 
@@ -1013,14 +1013,14 @@
                 navigator.vibrate([500, 200, 500, 200, 500, 200, 500]);
             }
 
-            addLog('🚨 ВИКЛИК ДОПОМОГИ!', true);
+            addLog('🚨 WEZWANIE POMOCY!', true);
 
             // Create emergency message
-            let emergencyMsg = '🚨 ТРИВОГА ПОЖЕЖНИКА!\n';
-            emergencyMsg += `Час: ${new Date().toLocaleString()}\n`;
+            let emergencyMsg = '🚨 ALARM STRAŻAKA!\n';
+            emergencyMsg += `Czas: ${new Date().toLocaleString()}\n`;
             
             if (lastPosition) {
-                emergencyMsg += `Координати: ${lastPosition.lat.toFixed(6)}, ${lastPosition.lon.toFixed(6)}\n`;
+                emergencyMsg += `Współrzędne: ${lastPosition.lat.toFixed(6)}, ${lastPosition.lon.toFixed(6)}\n`;
                 emergencyMsg += `Google Maps: https://maps.google.com/?q=${lastPosition.lat},${lastPosition.lon}`;
             }
 
@@ -1035,7 +1035,7 @@
             });
 
             statusIndicator.classList.add('danger');
-            statusText.textContent = 'SOS АКТИВНИЙ';
+            statusText.textContent = 'SOS AKTYWNY';
         }
 
         // Reset alerts
@@ -1044,13 +1044,13 @@
             document.querySelectorAll('.sensor-card').forEach(card => {
                 card.classList.remove('alert');
             });
-            document.getElementById('fallStatus').textContent = 'НОРМА ✓';
+            document.getElementById('fallStatus').textContent = 'NORMA ✓';
             document.getElementById('fallStatus').style.color = '#28a745';
             statusIndicator.classList.remove('danger', 'warning');
             if (isMonitoring) {
-                statusText.textContent = 'АКТИВНИЙ';
+                statusText.textContent = 'AKTYWNY';
             }
-            addLog('🔄 Систему скинуто');
+            addLog('🔄 System zresetowany');
         }
 
         // Add log entry
@@ -1069,18 +1069,18 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            addLog('🔥 FireGuard v1.0 завантажено');
+            addLog('🔥 FireGuard v1.0 załadowano');
             checkSecureContext();
 
             // Check if sensors are available
             if (!navigator.geolocation) {
-                addLog('⚠️ Geolocation API не підтримується', true);
+                addLog('⚠️ Geolocation API nie jest obsługiwane', true);
             }
             if (!window.DeviceMotionEvent) {
-                addLog('⚠️ DeviceMotion API не підтримується', true);
+                addLog('⚠️ DeviceMotion API nie jest obsługiwane', true);
             }
             if (!window.DeviceOrientationEvent) {
-                addLog('⚠️ DeviceOrientation API не підтримується', true);
+                addLog('⚠️ DeviceOrientation API nie jest obsługiwane', true);
             }
         });
 
@@ -1089,7 +1089,7 @@
             if ('wakeLock' in navigator) {
                 try {
                     await navigator.wakeLock.request('screen');
-                    addLog('📱 Екран заблоковано від сну');
+                    addLog('📱 Ekran zablokowany przed uśpieniem');
                 } catch (err) {
                     console.log('Wake Lock error:', err);
                 }
@@ -1098,4 +1098,3 @@
     </script>
 </body>
 </html>
-
