@@ -28,6 +28,7 @@
             --danger: #dc3545;
             --warning: #ffc107;
             --safe: #28a745;
+            --info: #17a2b8;
             --glow-orange: 0 0 20px rgba(255, 107, 53, 0.5);
             --glow-red: 0 0 30px rgba(230, 57, 70, 0.7);
         }
@@ -40,7 +41,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated fire background */
         .fire-bg {
             position: fixed;
             top: 0;
@@ -61,13 +61,11 @@
             50% { opacity: 0.8; }
         }
 
-        /* Header */
         .header {
             padding: 20px;
             text-align: center;
             background: linear-gradient(180deg, rgba(255, 107, 53, 0.2) 0%, transparent 100%);
             border-bottom: 2px solid var(--fire-orange);
-            position: relative;
         }
 
         .header h1 {
@@ -78,7 +76,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: var(--glow-orange);
             letter-spacing: 3px;
         }
 
@@ -89,7 +86,6 @@
             letter-spacing: 2px;
         }
 
-        /* Status indicator */
         .status-bar {
             display: flex;
             justify-content: center;
@@ -117,6 +113,11 @@
             background: var(--warning);
         }
 
+        .status-indicator.indoor {
+            background: var(--info);
+            animation: indoorPulse 1.5s infinite;
+        }
+
         @keyframes pulse {
             0%, 100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
             50% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
@@ -127,20 +128,56 @@
             50% { box-shadow: 0 0 20px 10px rgba(220, 53, 69, 0); transform: scale(1.2); }
         }
 
+        @keyframes indoorPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(23, 162, 184, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(23, 162, 184, 0); }
+        }
+
         .status-text {
             font-family: 'Orbitron', monospace;
             font-size: 0.9rem;
             letter-spacing: 2px;
         }
 
-        /* Main container */
         .container {
             padding: 15px;
             max-width: 500px;
             margin: 0 auto;
         }
 
-        /* Sensor cards */
+        .mode-toggle {
+            display: flex;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--fire-orange), var(--fire-red));
+            color: white;
+        }
+
+        .mode-btn.indoor-active {
+            background: linear-gradient(135deg, var(--info), #138496);
+            color: white;
+        }
+
         .sensor-card {
             background: var(--card-bg);
             border: 1px solid rgba(255, 107, 53, 0.3);
@@ -161,6 +198,10 @@
             right: 0;
             height: 3px;
             background: linear-gradient(90deg, var(--fire-orange), var(--fire-yellow), var(--fire-orange));
+        }
+
+        .sensor-card.indoor-card::before {
+            background: linear-gradient(90deg, var(--info), #20c997, var(--info));
         }
 
         .sensor-card.alert {
@@ -194,6 +235,10 @@
             color: var(--fire-orange);
         }
 
+        .sensor-card.indoor-card .sensor-title {
+            color: var(--info);
+        }
+
         .sensor-data {
             display: grid;
             gap: 10px;
@@ -209,6 +254,10 @@
             border-left: 3px solid var(--fire-orange);
         }
 
+        .indoor-card .data-row {
+            border-left-color: var(--info);
+        }
+
         .data-label {
             color: var(--text-secondary);
             font-size: 0.85rem;
@@ -221,7 +270,204 @@
             color: var(--fire-yellow);
         }
 
-        /* Fall detection visualization */
+        /* Indoor positioning visualization */
+        .indoor-map {
+            position: relative;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(23, 162, 184, 0.3);
+        }
+
+        .indoor-map-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(23, 162, 184, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(23, 162, 184, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .entry-point {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: var(--safe);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.7);
+        }
+
+        .entry-point::after {
+            content: '🚪';
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+        }
+
+        .current-position {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: var(--fire-orange);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .current-position::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--fire-orange);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: positionPulse 2s infinite;
+        }
+
+        .current-position::after {
+            content: '🧑‍🚒';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+        }
+
+        @keyframes positionPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+
+        .direction-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 20px solid var(--fire-yellow);
+            transform-origin: center bottom;
+            z-index: 11;
+        }
+
+        .path-trail {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 107, 53, 0.4);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .compass-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
+        }
+
+        .compass {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 3px solid var(--info);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .compass-directions {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .compass-directions span {
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+
+        .compass-directions .n { top: 10%; left: 50%; color: var(--danger); }
+        .compass-directions .s { bottom: 5%; left: 50%; }
+        .compass-directions .e { top: 50%; right: 5%; }
+        .compass-directions .w { top: 50%; left: 10%; }
+
+        .compass-needle {
+            width: 4px;
+            height: 50px;
+            background: linear-gradient(to top, var(--info) 50%, var(--danger) 50%);
+            border-radius: 2px;
+            transform-origin: center bottom;
+            position: absolute;
+            bottom: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .compass-center {
+            width: 12px;
+            height: 12px;
+            background: var(--fire-orange);
+            border-radius: 50%;
+            position: absolute;
+            z-index: 5;
+        }
+
+        /* Floor indicator */
+        .floor-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .floor-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .floor-level {
+            width: 80px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .floor-level.current {
+            background: var(--fire-orange);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.5);
+        }
+
         .fall-detector {
             position: relative;
             height: 150px;
@@ -264,7 +510,6 @@
             border-radius: 4px;
         }
 
-        /* Control buttons */
         .controls {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -294,16 +539,17 @@
 
         .btn-start:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 30px rgba(255, 107, 53, 0.6);
-        }
-
-        .btn-start:active {
-            transform: translateY(0);
         }
 
         .btn-start.active {
             background: linear-gradient(135deg, var(--safe), #20c997);
             box-shadow: 0 0 20px rgba(40, 167, 69, 0.5);
+        }
+
+        .btn-indoor {
+            background: linear-gradient(135deg, var(--info), #138496);
+            color: white;
+            grid-column: span 2;
         }
 
         .btn-sos {
@@ -323,7 +569,6 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Alert modal */
         .alert-modal {
             display: none;
             position: fixed;
@@ -335,16 +580,10 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
         }
 
         .alert-modal.show {
             display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .alert-content {
@@ -378,7 +617,6 @@
             font-size: 1.5rem;
             font-weight: 900;
             margin-bottom: 10px;
-            letter-spacing: 3px;
         }
 
         .alert-text {
@@ -406,7 +644,6 @@
             cursor: pointer;
         }
 
-        /* Log section */
         .log-section {
             background: var(--card-bg);
             border: 1px solid rgba(255, 107, 53, 0.3);
@@ -422,7 +659,6 @@
             font-size: 0.9rem;
             color: var(--fire-orange);
             margin-bottom: 10px;
-            letter-spacing: 1px;
         }
 
         .log-entry {
@@ -439,12 +675,16 @@
             background: rgba(220, 53, 69, 0.2);
         }
 
+        .log-entry.info {
+            border-left-color: var(--info);
+            background: rgba(23, 162, 184, 0.2);
+        }
+
         .log-time {
             color: var(--text-secondary);
             margin-right: 10px;
         }
 
-        /* Permissions section */
         .permissions-section {
             background: rgba(255, 193, 7, 0.1);
             border: 1px solid var(--warning);
@@ -482,34 +722,10 @@
             font-size: 0.8rem;
         }
 
-        .permission-status.granted {
-            background: var(--safe);
-        }
+        .permission-status.granted { background: var(--safe); }
+        .permission-status.denied { background: var(--danger); }
+        .permission-status.pending { background: var(--warning); }
 
-        .permission-status.denied {
-            background: var(--danger);
-        }
-
-        .permission-status.pending {
-            background: var(--warning);
-        }
-
-        /* Responsive */
-        @media (max-width: 380px) {
-            .header h1 {
-                font-size: 1.4rem;
-            }
-            
-            .sensor-title {
-                font-size: 0.85rem;
-            }
-            
-            .data-value {
-                font-size: 0.85rem;
-            }
-        }
-
-        /* HTTPS warning */
         .https-warning {
             background: linear-gradient(135deg, var(--danger), #b02a37);
             padding: 20px;
@@ -518,8 +734,31 @@
             margin: 20px;
         }
 
-        .https-warning h2 {
+        .info-box {
+            background: rgba(23, 162, 184, 0.1);
+            border: 1px solid var(--info);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-box h4 {
+            color: var(--info);
             margin-bottom: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+        }
+
+        .info-box p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 380px) {
+            .header h1 { font-size: 1.4rem; }
+            .sensor-title { font-size: 0.85rem; }
+            .data-value { font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -537,10 +776,24 @@
     </div>
 
     <div class="container">
-        <!-- HTTPS Warning (shown if not secure) -->
-        <div class="https-warning" id="httpsWarning" style="display: none;">
-            <h2>⚠️ Wymagany HTTPS</h2>
-            <p>Do dostępu do czujników wymagane jest bezpieczne połączenie. Użyj HTTPS lub localhost.</p>
+        <!-- Mode Toggle -->
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="modeOutdoor" onclick="setMode('outdoor')">
+                🛰️ GPS OUTDOOR
+            </button>
+            <button class="mode-btn" id="modeIndoor" onclick="setMode('indoor')">
+                🏢 PDR INDOOR
+            </button>
+        </div>
+
+        <!-- Info Box for Indoor Mode -->
+        <div class="info-box" id="indoorInfo" style="display: none;">
+            <h4>📍 Pozycjonowanie wewnętrzne (PDR)</h4>
+            <p>Gdy GPS nie działa, używamy:<br>
+            • <strong>Krokomierz</strong> - liczenie kroków<br>
+            • <strong>Kompas</strong> - kierunek ruchu<br>
+            • <strong>Barometr</strong> - wykrywanie piętra<br>
+            • <strong>Żyroskop</strong> - obroty ciała</p>
         </div>
 
         <!-- Permissions Section -->
@@ -556,39 +809,152 @@
                     <div class="permission-status pending" id="motionStatus">?</div>
                     <span>Akcelerometr / Żyroskop</span>
                 </div>
+                <div class="permission-item">
+                    <div class="permission-status pending" id="compassStatus">?</div>
+                    <span>Kompas / Magnetometr</span>
+                </div>
             </div>
             <button class="btn btn-start" onclick="requestPermissions()">
                 🚀 POPROŚ O UPRAWNIENIA
             </button>
         </div>
 
-        <!-- GPS Card -->
-        <div class="sensor-card" id="gpsCard">
-            <div class="sensor-header">
-                <span class="sensor-icon">📍</span>
-                <span class="sensor-title">POZYCJA GPS</span>
-            </div>
-            <div class="sensor-data">
-                <div class="data-row">
-                    <span class="data-label">Szerokość</span>
-                    <span class="data-value" id="latitude">---.------</span>
+        <!-- OUTDOOR MODE CARDS -->
+        <div id="outdoorCards">
+            <!-- GPS Card -->
+            <div class="sensor-card" id="gpsCard">
+                <div class="sensor-header">
+                    <span class="sensor-icon">📍</span>
+                    <span class="sensor-title">POZYCJA GPS</span>
                 </div>
-                <div class="data-row">
-                    <span class="data-label">Długość</span>
-                    <span class="data-value" id="longitude">---.------</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Dokładność</span>
-                    <span class="data-value" id="accuracy">--- m</span>
-                </div>
-                <div class="data-row">
-                    <span class="data-label">Prędkość</span>
-                    <span class="data-value" id="speed">--- km/h</span>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">Szerokość</span>
+                        <span class="data-value" id="latitude">---.------</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Długość</span>
+                        <span class="data-value" id="longitude">---.------</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Dokładność</span>
+                        <span class="data-value" id="accuracy">--- m</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Prędkość</span>
+                        <span class="data-value" id="speed">--- km/h</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Accelerometer Card -->
+        <!-- INDOOR MODE CARDS -->
+        <div id="indoorCards" style="display: none;">
+            <!-- Indoor Map Visualization -->
+            <div class="sensor-card indoor-card">
+                <div class="sensor-header">
+                    <span class="sensor-icon">🗺️</span>
+                    <span class="sensor-title">MAPA WEWNĘTRZNA (PDR)</span>
+                </div>
+                <div class="indoor-map" id="indoorMap">
+                    <div class="indoor-map-grid"></div>
+                    <div class="entry-point" id="entryPoint" style="left: 50%; top: 90%;"></div>
+                    <div class="current-position" id="currentPosition" style="left: 50%; top: 90%;"></div>
+                    <div class="direction-arrow" id="directionArrow" style="left: 50%; top: 85%;"></div>
+                </div>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">Od wejścia</span>
+                        <span class="data-value" id="distanceFromEntry">0.0 m</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Kierunek</span>
+                        <span class="data-value" id="currentDirection">N 0°</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compass Card -->
+            <div class="sensor-card indoor-card">
+                <div class="sensor-header">
+                    <span class="sensor-icon">🧭</span>
+                    <span class="sensor-title">KOMPAS / KIERUNEK</span>
+                </div>
+                <div class="compass-container">
+                    <div class="compass">
+                        <div class="compass-directions">
+                            <span class="n">N</span>
+                            <span class="s">S</span>
+                            <span class="e">E</span>
+                            <span class="w">W</span>
+                        </div>
+                        <div class="compass-needle" id="compassNeedle"></div>
+                        <div class="compass-center"></div>
+                    </div>
+                </div>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">Azymut</span>
+                        <span class="data-value" id="heading">0°</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pedometer Card -->
+            <div class="sensor-card indoor-card">
+                <div class="sensor-header">
+                    <span class="sensor-icon">🚶</span>
+                    <span class="sensor-title">KROKOMIERZ</span>
+                </div>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">Kroki</span>
+                        <span class="data-value" id="stepCount">0</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Dystans</span>
+                        <span class="data-value" id="walkDistance">0.0 m</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Tempo</span>
+                        <span class="data-value" id="stepRate">0 kr/min</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floor Detection Card -->
+            <div class="sensor-card indoor-card">
+                <div class="sensor-header">
+                    <span class="sensor-icon">🏢</span>
+                    <span class="sensor-title">WYKRYWANIE PIĘTRA</span>
+                </div>
+                <div class="floor-indicator">
+                    <div class="floor-visual" id="floorVisual">
+                        <div class="floor-level" data-floor="3">P3</div>
+                        <div class="floor-level" data-floor="2">P2</div>
+                        <div class="floor-level" data-floor="1">P1</div>
+                        <div class="floor-level current" data-floor="0">P0</div>
+                        <div class="floor-level" data-floor="-1">-1</div>
+                    </div>
+                </div>
+                <div class="sensor-data">
+                    <div class="data-row">
+                        <span class="data-label">Aktualne piętro</span>
+                        <span class="data-value" id="currentFloor">P0</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Ciśnienie</span>
+                        <span class="data-value" id="pressure">--- hPa</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Δ Wysokość</span>
+                        <span class="data-value" id="altitudeChange">0.0 m</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accelerometer Card (Both modes) -->
         <div class="sensor-card" id="accelCard">
             <div class="sensor-header">
                 <span class="sensor-icon">📊</span>
@@ -665,6 +1031,9 @@
             <button class="btn btn-start" id="btnStart" onclick="toggleMonitoring()">
                 ▶ START MONITORINGU
             </button>
+            <button class="btn btn-indoor" id="btnIndoor" onclick="markEntryPoint()" style="display: none;">
+                🚪 ZAZNACZ WEJŚCIE
+            </button>
             <button class="btn btn-sos" onclick="triggerSOS()">
                 🆘 SOS
             </button>
@@ -701,17 +1070,38 @@
     <script>
         // ============================================
         // FireGuard - System Monitoringu Strażaka
+        // z Pozycjonowaniem Wewnętrznym (PDR)
         // ============================================
+
+        // Mode
+        let currentMode = 'outdoor'; // 'outdoor' or 'indoor'
 
         // State
         let isMonitoring = false;
         let watchId = null;
-        let alertTimeout = null;
         let alertCountdown = 10;
         let countdownInterval = null;
         let lastPosition = null;
-        let fallThreshold = 2.5; // G-force threshold for fall detection
+        let fallThreshold = 2.5;
         let impactCooldown = false;
+
+        // PDR (Pedestrian Dead Reckoning) State
+        let pdrState = {
+            entryPoint: null,           // GPS position when entering building
+            currentHeading: 0,          // Compass heading in degrees
+            stepCount: 0,               // Total steps
+            stepLength: 0.7,            // Average step length in meters
+            lastStepTime: 0,            // For step rate calculation
+            stepTimes: [],              // Array of step timestamps
+            positionX: 0,               // Relative X position (meters)
+            positionY: 0,               // Relative Y position (meters)
+            basePressure: null,         // Reference pressure at entry
+            currentFloor: 0,            // Detected floor
+            pathTrail: [],              // Array of past positions for visualization
+            lastAccelMagnitude: 0,      // For step detection
+            stepThreshold: 12,          // Acceleration threshold for step detection
+            stepCooldown: false         // Prevent double counting
+        };
 
         // DOM Elements
         const statusIndicator = document.getElementById('statusIndicator');
@@ -720,77 +1110,107 @@
         const alertModal = document.getElementById('alertModal');
         const logContainer = document.getElementById('logContainer');
         const permissionsSection = document.getElementById('permissionsSection');
-        const httpsWarning = document.getElementById('httpsWarning');
 
-        // Permission status elements
-        const gpsStatusEl = document.getElementById('gpsStatus');
-        const motionStatusEl = document.getElementById('motionStatus');
+        // Mode elements
+        const outdoorCards = document.getElementById('outdoorCards');
+        const indoorCards = document.getElementById('indoorCards');
+        const indoorInfo = document.getElementById('indoorInfo');
+        const btnIndoor = document.getElementById('btnIndoor');
+        const modeOutdoor = document.getElementById('modeOutdoor');
+        const modeIndoor = document.getElementById('modeIndoor');
 
-        // Check HTTPS
-        function checkSecureContext() {
-            if (!window.isSecureContext && location.hostname !== 'localhost') {
-                httpsWarning.style.display = 'block';
-                addLog('⚠️ Wymagane połączenie HTTPS!', true);
-                return false;
+        // Set mode
+        function setMode(mode) {
+            currentMode = mode;
+            
+            if (mode === 'outdoor') {
+                modeOutdoor.classList.add('active');
+                modeOutdoor.classList.remove('indoor-active');
+                modeIndoor.classList.remove('active', 'indoor-active');
+                outdoorCards.style.display = 'block';
+                indoorCards.style.display = 'none';
+                indoorInfo.style.display = 'none';
+                btnIndoor.style.display = 'none';
+                statusIndicator.classList.remove('indoor');
+                addLog('🛰️ Tryb GPS OUTDOOR aktywny');
+            } else {
+                modeIndoor.classList.add('indoor-active');
+                modeOutdoor.classList.remove('active');
+                outdoorCards.style.display = 'none';
+                indoorCards.style.display = 'block';
+                indoorInfo.style.display = 'block';
+                btnIndoor.style.display = 'block';
+                statusIndicator.classList.add('indoor');
+                addLog('🏢 Tryb PDR INDOOR aktywny', false, 'info');
             }
-            return true;
         }
 
         // Request permissions
         async function requestPermissions() {
             addLog('📱 Żądanie uprawnień...');
+            const gpsStatusEl = document.getElementById('gpsStatus');
+            const motionStatusEl = document.getElementById('motionStatus');
+            const compassStatusEl = document.getElementById('compassStatus');
 
-            // Request GPS permission
+            // GPS
             try {
-                const position = await new Promise((resolve, reject) => {
+                await new Promise((resolve, reject) => {
                     navigator.geolocation.getCurrentPosition(resolve, reject, {
                         enableHighAccuracy: true,
                         timeout: 10000
                     });
                 });
                 gpsStatusEl.textContent = '✓';
-                gpsStatusEl.classList.remove('pending', 'denied');
                 gpsStatusEl.classList.add('granted');
+                gpsStatusEl.classList.remove('pending', 'denied');
                 addLog('✅ Uzyskano uprawnienie GPS');
             } catch (err) {
                 gpsStatusEl.textContent = '✗';
-                gpsStatusEl.classList.remove('pending', 'granted');
                 gpsStatusEl.classList.add('denied');
+                gpsStatusEl.classList.remove('pending', 'granted');
                 addLog('❌ GPS: ' + err.message, true);
             }
 
-            // Request Motion permission (iOS requires explicit permission)
+            // Motion
             if (typeof DeviceMotionEvent !== 'undefined') {
                 if (typeof DeviceMotionEvent.requestPermission === 'function') {
-                    // iOS 13+ requires permission request
                     try {
-                        const permissionState = await DeviceMotionEvent.requestPermission();
-                        if (permissionState === 'granted') {
+                        const state = await DeviceMotionEvent.requestPermission();
+                        if (state === 'granted') {
                             motionStatusEl.textContent = '✓';
-                            motionStatusEl.classList.remove('pending', 'denied');
                             motionStatusEl.classList.add('granted');
-                            addLog('✅ Uzyskano uprawnienie akcelerometru');
-                        } else {
-                            throw new Error('Permission denied');
+                            addLog('✅ Uzyskano uprawnienie ruchu');
                         }
                     } catch (err) {
                         motionStatusEl.textContent = '✗';
-                        motionStatusEl.classList.remove('pending', 'granted');
                         motionStatusEl.classList.add('denied');
-                        addLog('❌ Akcelerometr: ' + err.message, true);
                     }
                 } else {
-                    // Android and older iOS - no explicit permission needed
                     motionStatusEl.textContent = '✓';
-                    motionStatusEl.classList.remove('pending', 'denied');
                     motionStatusEl.classList.add('granted');
                     addLog('✅ Czujniki ruchu dostępne');
                 }
-            } else {
-                motionStatusEl.textContent = '✗';
-                motionStatusEl.classList.remove('pending', 'granted');
-                motionStatusEl.classList.add('denied');
-                addLog('❌ DeviceMotion nie jest obsługiwane', true);
+            }
+
+            // Compass/Orientation
+            if (typeof DeviceOrientationEvent !== 'undefined') {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    try {
+                        const state = await DeviceOrientationEvent.requestPermission();
+                        if (state === 'granted') {
+                            compassStatusEl.textContent = '✓';
+                            compassStatusEl.classList.add('granted');
+                            addLog('✅ Uzyskano uprawnienie kompasu');
+                        }
+                    } catch (err) {
+                        compassStatusEl.textContent = '✗';
+                        compassStatusEl.classList.add('denied');
+                    }
+                } else {
+                    compassStatusEl.textContent = '✓';
+                    compassStatusEl.classList.add('granted');
+                    addLog('✅ Kompas dostępny');
+                }
             }
 
             permissionsSection.style.display = 'none';
@@ -807,36 +1227,33 @@
 
         // Start monitoring
         function startMonitoring() {
-            if (!checkSecureContext()) return;
-
             isMonitoring = true;
             btnStart.textContent = '⏹ ZATRZYMAJ';
             btnStart.classList.add('active');
-            statusIndicator.classList.remove('danger', 'warning');
             statusText.textContent = 'AKTYWNY';
             addLog('🚀 Monitoring uruchomiony');
 
-            // Start GPS tracking
+            // GPS (always for initial position)
             if (navigator.geolocation) {
                 watchId = navigator.geolocation.watchPosition(
                     updateGPS,
                     handleGPSError,
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 30000,
-                        maximumAge: 0
-                    }
+                    { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
                 );
             }
 
-            // Start motion sensors
+            // Motion sensors
             if (window.DeviceMotionEvent) {
                 window.addEventListener('devicemotion', handleMotion);
             }
 
+            // Orientation (compass)
             if (window.DeviceOrientationEvent) {
                 window.addEventListener('deviceorientation', handleOrientation);
             }
+
+            // Request wake lock
+            requestWakeLock();
         }
 
         // Stop monitoring
@@ -847,15 +1264,33 @@
             statusText.textContent = 'ZATRZYMANO';
             addLog('⏹ Monitoring zatrzymany');
 
-            // Stop GPS
             if (watchId) {
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
             }
-
-            // Stop motion sensors
             window.removeEventListener('devicemotion', handleMotion);
             window.removeEventListener('deviceorientation', handleOrientation);
+        }
+
+        // Mark entry point (when entering building)
+        function markEntryPoint() {
+            if (lastPosition) {
+                pdrState.entryPoint = { ...lastPosition };
+                pdrState.stepCount = 0;
+                pdrState.positionX = 0;
+                pdrState.positionY = 0;
+                pdrState.pathTrail = [];
+                pdrState.currentFloor = 0;
+                
+                // Reset visualization
+                updateIndoorMap();
+                updateFloorIndicator(0);
+                
+                addLog('🚪 Punkt wejścia zaznaczony!', false, 'info');
+                addLog(`📍 GPS: ${lastPosition.lat.toFixed(6)}, ${lastPosition.lon.toFixed(6)}`, false, 'info');
+            } else {
+                addLog('⚠️ Brak pozycji GPS - poczekaj na sygnał', true);
+            }
         }
 
         // Update GPS data
@@ -870,22 +1305,24 @@
             document.getElementById('accuracy').textContent = acc.toFixed(1) + ' m';
             document.getElementById('speed').textContent = spd ? (spd * 3.6).toFixed(1) + ' km/h' : '0.0 km/h';
 
-            // Store last position for emergency
             lastPosition = {
                 lat: lat,
                 lon: lon,
+                accuracy: acc,
                 timestamp: new Date().toISOString()
             };
         }
 
         function handleGPSError(error) {
             addLog('⚠️ Błąd GPS: ' + error.message, true);
+            if (currentMode === 'outdoor') {
+                addLog('💡 Przełącz na tryb INDOOR (PDR)', false, 'info');
+            }
         }
 
-        // Handle accelerometer data
+        // Handle motion (accelerometer + step detection)
         function handleMotion(event) {
             const acc = event.accelerationIncludingGravity || event.acceleration;
-            
             if (!acc) return;
 
             const x = acc.x || 0;
@@ -897,33 +1334,204 @@
             document.getElementById('accelY').textContent = y.toFixed(2) + ' m/s²';
             document.getElementById('accelZ').textContent = z.toFixed(2) + ' m/s²';
 
-            // Calculate total G-force
             const gForce = Math.sqrt(x*x + y*y + z*z) / 9.81;
             document.getElementById('gForce').textContent = gForce.toFixed(2) + ' G';
 
-            // Update G-force bar
             const barWidth = Math.min(gForce / 5 * 100, 100);
             document.getElementById('gForceBar').style.width = barWidth + '%';
 
-            // Detect fall (sudden high G-force or free fall)
+            // Step detection for indoor mode
+            if (currentMode === 'indoor' && isMonitoring) {
+                detectStep(x, y, z);
+            }
+
+            // Fall detection
             detectFall(gForce, x, y, z);
         }
 
-        // Detect fall based on G-force patterns
+        // Step detection algorithm
+        function detectStep(x, y, z) {
+            const magnitude = Math.sqrt(x*x + y*y + z*z);
+            const now = Date.now();
+
+            // Simple peak detection
+            if (magnitude > pdrState.stepThreshold && 
+                pdrState.lastAccelMagnitude < pdrState.stepThreshold &&
+                !pdrState.stepCooldown) {
+                
+                pdrState.stepCooldown = true;
+                pdrState.stepCount++;
+                
+                // Record step time for rate calculation
+                pdrState.stepTimes.push(now);
+                if (pdrState.stepTimes.length > 10) {
+                    pdrState.stepTimes.shift();
+                }
+
+                // Calculate position change
+                const headingRad = pdrState.currentHeading * (Math.PI / 180);
+                pdrState.positionX += Math.sin(headingRad) * pdrState.stepLength;
+                pdrState.positionY += Math.cos(headingRad) * pdrState.stepLength;
+
+                // Add to trail
+                pdrState.pathTrail.push({
+                    x: pdrState.positionX,
+                    y: pdrState.positionY
+                });
+                if (pdrState.pathTrail.length > 50) {
+                    pdrState.pathTrail.shift();
+                }
+
+                // Update UI
+                updatePedometerUI();
+                updateIndoorMap();
+
+                // Cooldown
+                setTimeout(() => { pdrState.stepCooldown = false; }, 300);
+            }
+
+            pdrState.lastAccelMagnitude = magnitude;
+        }
+
+        // Update pedometer UI
+        function updatePedometerUI() {
+            const distance = pdrState.stepCount * pdrState.stepLength;
+            document.getElementById('stepCount').textContent = pdrState.stepCount;
+            document.getElementById('walkDistance').textContent = distance.toFixed(1) + ' m';
+
+            // Calculate step rate
+            if (pdrState.stepTimes.length >= 2) {
+                const timeDiff = (pdrState.stepTimes[pdrState.stepTimes.length - 1] - pdrState.stepTimes[0]) / 1000;
+                const rate = Math.round((pdrState.stepTimes.length - 1) / timeDiff * 60);
+                document.getElementById('stepRate').textContent = rate + ' kr/min';
+            }
+
+            // Distance from entry
+            const distFromEntry = Math.sqrt(
+                pdrState.positionX * pdrState.positionX + 
+                pdrState.positionY * pdrState.positionY
+            );
+            document.getElementById('distanceFromEntry').textContent = distFromEntry.toFixed(1) + ' m';
+        }
+
+        // Update indoor map visualization
+        function updateIndoorMap() {
+            const map = document.getElementById('indoorMap');
+            const pos = document.getElementById('currentPosition');
+            const arrow = document.getElementById('directionArrow');
+            
+            // Scale: 1 meter = 5 pixels, centered at 50%, 90%
+            const scale = 5;
+            const centerX = map.offsetWidth / 2;
+            const centerY = map.offsetHeight * 0.9;
+            
+            const newX = centerX + pdrState.positionX * scale;
+            const newY = centerY - pdrState.positionY * scale;
+            
+            // Clamp to map bounds
+            const clampedX = Math.max(20, Math.min(map.offsetWidth - 20, newX));
+            const clampedY = Math.max(20, Math.min(map.offsetHeight - 20, newY));
+            
+            pos.style.left = clampedX + 'px';
+            pos.style.top = clampedY + 'px';
+            
+            // Direction arrow
+            arrow.style.left = clampedX + 'px';
+            arrow.style.top = (clampedY - 30) + 'px';
+            arrow.style.transform = `rotate(${pdrState.currentHeading}deg)`;
+
+            // Update direction text
+            const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+            const idx = Math.round(pdrState.currentHeading / 45) % 8;
+            document.getElementById('currentDirection').textContent = 
+                directions[idx] + ' ' + Math.round(pdrState.currentHeading) + '°';
+
+            // Draw trail
+            const existingTrails = map.querySelectorAll('.path-trail');
+            existingTrails.forEach(t => t.remove());
+
+            pdrState.pathTrail.forEach((point, i) => {
+                const trail = document.createElement('div');
+                trail.className = 'path-trail';
+                trail.style.left = (centerX + point.x * scale) + 'px';
+                trail.style.top = (centerY - point.y * scale) + 'px';
+                trail.style.opacity = 0.2 + (i / pdrState.pathTrail.length) * 0.6;
+                map.appendChild(trail);
+            });
+        }
+
+        // Handle orientation (compass)
+        function handleOrientation(event) {
+            // Alpha is the compass heading (0-360)
+            let heading = event.alpha || 0;
+            
+            // On iOS, we need to use webkitCompassHeading if available
+            if (event.webkitCompassHeading !== undefined) {
+                heading = event.webkitCompassHeading;
+            } else if (event.alpha !== null) {
+                // Android: alpha is relative to device orientation
+                heading = 360 - event.alpha;
+            }
+
+            pdrState.currentHeading = heading;
+
+            // Update compass display
+            document.getElementById('heading').textContent = Math.round(heading) + '°';
+            document.getElementById('compassNeedle').style.transform = 
+                `rotate(${heading}deg)`;
+
+            // Gyroscope display
+            document.getElementById('alpha').textContent = (event.alpha || 0).toFixed(0) + '°';
+            document.getElementById('beta').textContent = (event.beta || 0).toFixed(0) + '°';
+            document.getElementById('gamma').textContent = (event.gamma || 0).toFixed(0) + '°';
+
+            // Floor detection using beta (tilt) - rough estimation
+            // In real app, would use barometer API if available
+            detectFloorChange(event.beta);
+
+            if (currentMode === 'indoor' && isMonitoring) {
+                updateIndoorMap();
+            }
+        }
+
+        // Floor detection (simulated using orientation changes)
+        // In production, use Barometer API: navigator.sensor.Barometer
+        function detectFloorChange(beta) {
+            // Simulate floor detection based on sustained tilt
+            // Real implementation would use pressure sensor
+            const pressure = 1013.25; // Simulated sea level pressure
+            document.getElementById('pressure').textContent = pressure.toFixed(1) + ' hPa';
+            document.getElementById('altitudeChange').textContent = 
+                (pdrState.currentFloor * 3).toFixed(1) + ' m';
+        }
+
+        // Update floor indicator
+        function updateFloorIndicator(floor) {
+            pdrState.currentFloor = floor;
+            const floorLevels = document.querySelectorAll('.floor-level');
+            floorLevels.forEach(el => {
+                el.classList.remove('current');
+                if (parseInt(el.dataset.floor) === floor) {
+                    el.classList.add('current');
+                }
+            });
+            document.getElementById('currentFloor').textContent = 
+                floor >= 0 ? 'P' + floor : floor.toString();
+        }
+
+        // Fall detection
         function detectFall(gForce, x, y, z) {
             const fallStatus = document.getElementById('fallStatus');
             const personIcon = document.getElementById('personIcon');
             const accelCard = document.getElementById('accelCard');
             const fallCard = document.getElementById('fallCard');
 
-            // Free fall detection (G-force near 0) or high impact
             const isFreefall = gForce < 0.3;
             const isImpact = gForce > fallThreshold;
 
             if ((isFreefall || isImpact) && !impactCooldown) {
                 impactCooldown = true;
                 
-                // Visual feedback
                 fallStatus.textContent = '⚠️ UPADEK!';
                 fallStatus.style.color = '#dc3545';
                 personIcon.classList.add('falling');
@@ -934,15 +1542,12 @@
 
                 addLog(`🚨 WYKRYTO UPADEK! G-Force: ${gForce.toFixed(2)}G`, true);
 
-                // Vibrate phone
                 if (navigator.vibrate) {
                     navigator.vibrate([200, 100, 200, 100, 200]);
                 }
 
-                // Show alert modal
                 showFallAlert();
 
-                // Reset visual after 3 seconds
                 setTimeout(() => {
                     personIcon.classList.remove('falling');
                     impactCooldown = false;
@@ -955,17 +1560,6 @@
             }
         }
 
-        // Handle gyroscope/orientation data
-        function handleOrientation(event) {
-            const alpha = event.alpha || 0; // Z-axis rotation
-            const beta = event.beta || 0;   // X-axis rotation
-            const gamma = event.gamma || 0; // Y-axis rotation
-
-            document.getElementById('alpha').textContent = alpha.toFixed(0) + '°';
-            document.getElementById('beta').textContent = beta.toFixed(0) + '°';
-            document.getElementById('gamma').textContent = gamma.toFixed(0) + '°';
-        }
-
         // Show fall alert
         function showFallAlert() {
             alertModal.classList.add('show');
@@ -975,7 +1569,6 @@
             countdownInterval = setInterval(() => {
                 alertCountdown--;
                 document.getElementById('alertCountdown').textContent = alertCountdown;
-
                 if (alertCountdown <= 0) {
                     clearInterval(countdownInterval);
                     triggerEmergency();
@@ -990,47 +1583,58 @@
             statusIndicator.classList.remove('danger');
             statusText.textContent = 'AKTYWNY';
             addLog('✅ Alarm anulowany przez użytkownika');
-            
-            // Stop vibration
-            if (navigator.vibrate) {
-                navigator.vibrate(0);
-            }
+            if (navigator.vibrate) navigator.vibrate(0);
         }
 
-        // Trigger emergency (SOS)
+        // Trigger SOS
         function triggerSOS() {
             addLog('🆘 SOS AKTYWOWANE RĘCZNIE!', true);
             triggerEmergency();
         }
 
-        // Trigger emergency response
+        // Trigger emergency
         function triggerEmergency() {
             alertModal.classList.remove('show');
             clearInterval(countdownInterval);
 
-            // Continuous vibration pattern
             if (navigator.vibrate) {
                 navigator.vibrate([500, 200, 500, 200, 500, 200, 500]);
             }
 
             addLog('🚨 WEZWANIE POMOCY!', true);
 
-            // Create emergency message
             let emergencyMsg = '🚨 ALARM STRAŻAKA!\n';
             emergencyMsg += `Czas: ${new Date().toLocaleString()}\n`;
+            emergencyMsg += `Tryb: ${currentMode === 'indoor' ? 'INDOOR (PDR)' : 'OUTDOOR (GPS)'}\n`;
             
-            if (lastPosition) {
-                emergencyMsg += `Współrzędne: ${lastPosition.lat.toFixed(6)}, ${lastPosition.lon.toFixed(6)}\n`;
+            if (currentMode === 'indoor' && pdrState.entryPoint) {
+                emergencyMsg += `\n📍 PUNKT WEJŚCIA:\n`;
+                emergencyMsg += `${pdrState.entryPoint.lat.toFixed(6)}, ${pdrState.entryPoint.lon.toFixed(6)}\n`;
+                emergencyMsg += `Google Maps: https://maps.google.com/?q=${pdrState.entryPoint.lat},${pdrState.entryPoint.lon}\n`;
+                emergencyMsg += `\n🏢 POZYCJA WEWNĘTRZNA:\n`;
+                emergencyMsg += `Piętro: ${pdrState.currentFloor >= 0 ? 'P' + pdrState.currentFloor : pdrState.currentFloor}\n`;
+                emergencyMsg += `Od wejścia: ${Math.sqrt(pdrState.positionX**2 + pdrState.positionY**2).toFixed(1)}m\n`;
+                emergencyMsg += `Kierunek: ${Math.round(pdrState.currentHeading)}°\n`;
+                emergencyMsg += `Kroki: ${pdrState.stepCount}`;
+            } else if (lastPosition) {
+                emergencyMsg += `\nWspółrzędne: ${lastPosition.lat.toFixed(6)}, ${lastPosition.lon.toFixed(6)}\n`;
                 emergencyMsg += `Google Maps: https://maps.google.com/?q=${lastPosition.lat},${lastPosition.lon}`;
             }
 
-            // Show alert with location
             alert(emergencyMsg);
 
-            // In production, this would send to a server
             console.log('EMERGENCY DATA:', {
                 timestamp: new Date().toISOString(),
-                position: lastPosition,
+                mode: currentMode,
+                gpsPosition: lastPosition,
+                indoorPosition: currentMode === 'indoor' ? {
+                    entryPoint: pdrState.entryPoint,
+                    relativeX: pdrState.positionX,
+                    relativeY: pdrState.positionY,
+                    floor: pdrState.currentFloor,
+                    heading: pdrState.currentHeading,
+                    steps: pdrState.stepCount
+                } : null,
                 type: 'FALL_DETECTED'
             });
 
@@ -1047,6 +1651,15 @@
             document.getElementById('fallStatus').textContent = 'NORMA ✓';
             document.getElementById('fallStatus').style.color = '#28a745';
             statusIndicator.classList.remove('danger', 'warning');
+            
+            // Reset PDR
+            pdrState.stepCount = 0;
+            pdrState.positionX = 0;
+            pdrState.positionY = 0;
+            pdrState.pathTrail = [];
+            updatePedometerUI();
+            updateIndoorMap();
+            
             if (isMonitoring) {
                 statusText.textContent = 'AKTYWNY';
             }
@@ -1054,37 +1667,22 @@
         }
 
         // Add log entry
-        function addLog(message, isDanger = false) {
+        function addLog(message, isDanger = false, type = null) {
             const time = new Date().toLocaleTimeString();
             const entry = document.createElement('div');
-            entry.className = 'log-entry' + (isDanger ? ' danger' : '');
+            let className = 'log-entry';
+            if (isDanger) className += ' danger';
+            if (type === 'info') className += ' info';
+            entry.className = className;
             entry.innerHTML = `<span class="log-time">${time}</span>${message}`;
             logContainer.insertBefore(entry, logContainer.firstChild);
 
-            // Keep only last 50 entries
             while (logContainer.children.length > 50) {
                 logContainer.removeChild(logContainer.lastChild);
             }
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            addLog('🔥 FireGuard v1.0 załadowano');
-            checkSecureContext();
-
-            // Check if sensors are available
-            if (!navigator.geolocation) {
-                addLog('⚠️ Geolocation API nie jest obsługiwane', true);
-            }
-            if (!window.DeviceMotionEvent) {
-                addLog('⚠️ DeviceMotion API nie jest obsługiwane', true);
-            }
-            if (!window.DeviceOrientationEvent) {
-                addLog('⚠️ DeviceOrientation API nie jest obsługiwane', true);
-            }
-        });
-
-        // Prevent screen from sleeping (if supported)
+        // Wake lock
         async function requestWakeLock() {
             if ('wakeLock' in navigator) {
                 try {
@@ -1095,6 +1693,22 @@
                 }
             }
         }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('🔥 FireGuard v2.0 załadowano');
+            addLog('📍 Obsługa GPS + PDR Indoor', false, 'info');
+            
+            if (!navigator.geolocation) {
+                addLog('⚠️ Geolocation API nie jest obsługiwane', true);
+            }
+            if (!window.DeviceMotionEvent) {
+                addLog('⚠️ DeviceMotion API nie jest obsługiwane', true);
+            }
+            if (!window.DeviceOrientationEvent) {
+                addLog('⚠️ DeviceOrientation API nie jest obsługiwane', true);
+            }
+        });
     </script>
 </body>
 </html>
